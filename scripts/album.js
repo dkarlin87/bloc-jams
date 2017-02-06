@@ -1,64 +1,104 @@
-var albumPicasso = {
-    name: 'The Colors',
-    artist: 'Pablo Picasso',
-    label: 'Cubism',
-    year: '1881',
-    albumArtUrl: 'assets/images/album_covers/01.png',
-    songs: [
-        { name: 'Blue', length: '4:26' },
-        { name: 'Green', length: '3:14' },
-        { name: 'Red', length: '5:01' },
-        { name: 'Pink', length: '3:21' },
-        { name: 'Magenta', length: '2:15' }
-    ]
-};
+body.album {
+    background-image: url(../assets/images/blurred_backgrounds/blur_bg_3.jpg);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center center;
+    background-size: cover;
+}
 
-var albumMarconi = {
-    name: 'The Telephone',
-    artist: 'Guglielmo Marconi',
-    label: 'EM',
-    year: '1909',
-    albumArtUrl: 'assets/images/album_covers/20.png',
-    songs: [
-        { name: 'Hello, Operator?', length: '1:01' },
-        { name: 'Ring, ring, ring', length: '5:01' },
-        { name: 'Fits in your pocket', length: '3:21' },
-        { name: 'Can you hear me now?', length: '3:14' },
-        { name: 'Wrong phone number', length: '2:15' }
-    ]
-};
+.album-cover-art {
+    position: relative;
+    left: 20%;
+    margin-top: 1rem;
+    width: 60%;
+}
 
-var createSongRow = function(songNumber, songName, songLength) {
-    var template =
-        '<tr class="album-view-song-item">'
-      + '  <td class="song-item-number">' + songNumber + '</td>'
-      + '  <td class="song-item-title">' + songName + '</td>'
-      + '  <td class="song-item-duration">' + songLength + '</td>'
-      + '</tr>'
-      ;
+.album-view-details {
+    position: relative;
+    top: 1.5rem;
+    padding: 1rem;
+}
 
-    return template;
-};
+.album-view-details .album-view-title {
+    font-weight: 300;
+    font-size: 2rem;
+}
 
-var setCurrentAlbum = function(album) {
-    var albumTitle = document.getElementsByClassName('album-view-title')[0];
-    var albumArtist = document.getElementsByClassName('album-view-artist')[0];
-    var albumReleaseInfo = document.getElementsByClassName('album-view-release-info')[0];
-    var albumImage = document.getElementsByClassName('album-cover-art')[0];
-    var albumSongList = document.getElementsByClassName('album-view-song-list')[0];
+.album-view-details .album-view-artist {
+    font-weight: 300;
+    font-size: 1.5rem;
+}
 
-    albumTitle.firstChild.nodeValue = album.name;
-    albumArtist.firstChild.nodeValue = album.artist;
-    albumReleaseInfo.firstChild.nodeValue = album.year + ' ' + album.label;
-    albumImage.setAttribute('src', album.albumArtUrl);
+.album-view-details .album-view-release-info {
+    font-weight: 300;
+    font-size: 0.75rem;
+}
 
-    albumSongList.innerHTML = '';
+.album-view-song-list {
+    width: 90%;
+    margin: 1.5rem auto;
+    font-weight: 300;
+    font-size: 0.75em;
+}
 
-    for (i = 0; i < album.songs.length; i++) {
-        albumSongList.innerHTML += createSongRow(i + 1, album.songs[i].name, album.songs[i].length);
+.album-view-song-item {
+    height: 3rem;
+    border-bottom: 1px solid rgba(255,255,255,0.5);
+}
+
+.song-item-number {
+    width: 5%;
+    min-width: 30px;
+}
+
+.song-item-title {
+    width: 85%;
+}
+
+.song-item-duration {
+    width: 5%;
+}
+
+.album-song-button {
+    text-align: center;
+    font-size: 14px;
+    background-color: white;
+    color: rgb(210, 40, 123);
+    border-radius: 50% 50%;
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+}
+
+.album-song-button:hover {
+    cursor: pointer;
+    color: white;
+    background-color: rgb(210, 40, 123);
+}
+
+.album-song-button span {
+    line-height: 28px;
+}
+
+.album-song-button .fa-play {
+    padding-left: 5px;
+}
+
+@media (max-width: 40rem) and (min-width: 20rem) {
+    .album-view-details {
+        text-align: center;
     }
-};
+    
+    .album-view-title {
+        margin-top: 0;   
+    }
+}
 
-window.onload = function() {
-    setCurrentAlbum(albumPicasso);
-};
+@media (max-width: 64rem) and (min-width: 20rem) {
+    .album-view-song-list {
+        position: relative;
+        top: 1rem;
+        width: 80%;
+        margin: auto;
+    }
+}
