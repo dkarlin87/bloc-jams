@@ -1,104 +1,139 @@
-body.album {
-    background-image: url(../assets/images/blurred_backgrounds/blur_bg_3.jpg);
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center center;
-    background-size: cover;
-}
+var albumPicasso = {
+    name: 'The Colors',
+    artist: 'Pablo Picasso',
+    label: 'Cubism',
+    year: '1881',
+    albumArtUrl: 'assets/images/album_covers/01.png',
+    songs: [
+        { name: 'Blue', length: '4:26' },
+        { name: 'Green', length: '3:14' },
+        { name: 'Red', length: '5:01' },
+        { name: 'Pink', length: '3:21' },
+        { name: 'Magenta', length: '2:15' }
+    ]
+};
 
-.album-cover-art {
-    position: relative;
-    left: 20%;
-    margin-top: 1rem;
-    width: 60%;
-}
+var albumMarconi = {
+    name: 'The Telephone',
+    artist: 'Guglielmo Marconi',
+    label: 'EM',
+    year: '1909',
+    albumArtUrl: 'assets/images/album_covers/20.png',
+    songs: [
+        { name: 'Hello, Operator?', length: '1:01' },
+        { name: 'Ring, ring, ring', length: '5:01' },
+        { name: 'Fits in your pocket', length: '3:21' },
+        { name: 'Can you hear me now?', length: '3:14' },
+        { name: 'Wrong phone number', length: '2:15' }
+    ]
+};
 
-.album-view-details {
-    position: relative;
-    top: 1.5rem;
-    padding: 1rem;
-}
+var createSongRow = function(songNumber, songName, songLength) {
+    var template =
+        '<tr class="album-view-song-item">'
+      + '  <td class="song-item-number" data-song-number="' + songNumber + '">' + songNumber + '</td>'
+      + '  <td class="song-item-title">' + songName + '</td>'
+      + '  <td class="song-item-duration">' + songLength + '</td>'
+      + '</tr>'
+      ;
 
-.album-view-details .album-view-title {
-    font-weight: 300;
-    font-size: 2rem;
-}
+    return template;
+};
 
-.album-view-details .album-view-artist {
-    font-weight: 300;
-    font-size: 1.5rem;
-}
+var setCurrentAlbum = function(album) {
+    var albumTitle = document.getElementsByClassName('album-view-title')[0];
+    var albumArtist = document.getElementsByClassName('album-view-artist')[0];
+    var albumReleaseInfo = document.getElementsByClassName('album-view-release-info')[0];
+    var albumImage = document.getElementsByClassName('album-cover-art')[0];
+    var albumSongList = document.getElementsByClassName('album-view-song-list')[0];
 
-.album-view-details .album-view-release-info {
-    font-weight: 300;
-    font-size: 0.75rem;
-}
+    albumTitle.firstChild.nodeValue = album.name;
+    albumArtist.firstChild.nodeValue = album.artist;
+    albumReleaseInfo.firstChild.nodeValue = album.year + ' ' + album.label;
+    albumImage.setAttribute('src', album.albumArtUrl);
 
-.album-view-song-list {
-    width: 90%;
-    margin: 1.5rem auto;
-    font-weight: 300;
-    font-size: 0.75em;
-}
+    albumSongList.innerHTML = '';
 
-.album-view-song-item {
-    height: 3rem;
-    border-bottom: 1px solid rgba(255,255,255,0.5);
-}
-
-.song-item-number {
-    width: 5%;
-    min-width: 30px;
-}
-
-.song-item-title {
-    width: 85%;
-}
-
-.song-item-duration {
-    width: 5%;
-}
-
-.album-song-button {
-    text-align: center;
-    font-size: 14px;
-    background-color: white;
-    color: rgb(210, 40, 123);
-    border-radius: 50% 50%;
-    display: inline-block;
-    width: 28px;
-    height: 28px;
-}
-
-.album-song-button:hover {
-    cursor: pointer;
-    color: white;
-    background-color: rgb(210, 40, 123);
-}
-
-.album-song-button span {
-    line-height: 28px;
-}
-
-.album-song-button .fa-play {
-    padding-left: 5px;
-}
-
-@media (max-width: 40rem) and (min-width: 20rem) {
-    .album-view-details {
-        text-align: center;
+    for (i = 0; i < album.songs.length; i++) {
+        albumSongList.innerHTML += createSongRow(i + 1, album.songs[i].name, album.songs[i].length);
     }
+};
+
+var findParentByClassName = function(element, targetClass) {
+    var currentParent = element.parentElement;
+    while (currentParent.className != targetClass) {
+        currentParent = currentParent.parentElement;
+    }
+    return currentParent;
+};
+
+var getSongItem = function(element) {  
+    switch (element.className) {
+        case 'album-song-button':
+        case 'ion-play':
+        case 'ion-pause':
+            return findParentByClassName(element, 'song-item-number');
+        case 'album-view-song-item':
+            return element.querySelector('.song-item-number');
+        case 'song-item-title':
+        case 'song-item-duration':
+            return findParentByClassName(element, 'album-view-song-item').querySelector('.song-item-number');
+        case 'song-item-number':
+            return element;
+        default:
+            return;
+    } 
+};
+
+var clickHandler = function(targetElement) {
+    var songItem = getSongItem(targetElement);
     
-    .album-view-title {
-        margin-top: 0;   
-    }
-}
+    if (currentlyPlayingSong === null) {
+        songItem.innerHTML = pauseButtonTemplate;
+        currentlyPlayingSong = songItem.getAttribute('data-song-number');
+    } else if (currentlyPlayingSong === songItem.getAttribute('data-song-number')) {
+        songItem.innerHTML = playButtonTemplate;
+        currentlyPlayingSong = null;
+    } else if (currentlyPlayingSong !== songItem.getAttribute('data-song-number')) {
+        var currentlyPlayingSongElement = document.querySelector('[data-song-number="' + currentlyPlayingSong + '"]');
+        currentlyPlayingSongElement.innerHTML = currentlyPlayingSongElement.getAttribute('data-song-number');
+        songItem.innerHTML = pauseButtonTemplate;
+        currentlyPlayingSong = songItem.getAttribute('data-song-number');
+    } 
+};
 
-@media (max-width: 64rem) and (min-width: 20rem) {
-    .album-view-song-list {
-        position: relative;
-        top: 1rem;
-        width: 80%;
-        margin: auto;
+var songListContainer = document.getElementsByClassName('album-view-song-list')[0];
+var songRows = document.getElementsByClassName('album-view-song-item');
+
+var playButtonTemplate = '<a class="album-song-button"><span class="ion-play"></span></a>';
+var pauseButtonTemplate = '<a class="album-song-button"><span class="ion-pause"></span></a>';
+
+var currentlyPlayingSong = null;
+
+window.onload = function() {
+    setCurrentAlbum(albumPicasso);
+    
+    songListContainer.addEventListener('mouseover', function(event) {
+        if (event.target.parentElement.className === 'album-view-song-item') {
+            var songItem = getSongItem(event.target);
+            
+            if (songItem.getAttribute('data-song-number') !== currentlyPlayingSong) {
+                songItem.innerHTML = playButtonTemplate;
+            }
+        }
+    });
+    
+    for (i = 0; i < songRows.length; i++) {
+        songRows[i].addEventListener('mouseleave', function(event) {
+            var songItem = getSongItem(event.target);
+            var songItemNumber = songItem.getAttribute('data-song-number');
+            
+            if (songItemNumber !== currentlyPlayingSong) {
+                songItem.innerHTML = songItemNumber;
+            }     
+        });
+        songRows[i].addEventListener('click', function(event) {
+             clickHandler(event.target);
+        });
     }
-}
+};
